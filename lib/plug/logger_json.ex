@@ -8,7 +8,6 @@ defmodule Plug.LoggerJSON do
     "client_version":  "ios/1.6.7",
     "date_time":       "2016-05-31T18:00:13Z",
     "duration":        4.670,
-    "fastly_duration": 2.670,
     "handler":         "fronts#index"
     "log_type":        "http",
     "method":          "POST",
@@ -62,7 +61,6 @@ defmodule Plug.LoggerJSON do
         "client_version"  => client_version(req_headers),
         "date_time"       => iso8601(:calendar.now_to_datetime(:os.timestamp)),
         "duration"        => Float.round(duration / 1000, 3),
-        "fastly_duration" => fastly_duration(req_headers),
         "log_type"        => "http",
         "method"          => conn.method,
         "params"          => req_params,
@@ -84,19 +82,6 @@ defmodule Plug.LoggerJSON do
         Map.get(headers, "user-agent", "N/A")
       accept_value ->
         accept_value
-    end
-  end
-
-  @spec fastly_duration(%{String.t => String.t}) :: integer
-  defp fastly_duration(headers) do
-    x_timer = Map.get(headers, "x-timer", "")
-    case String.split(x_timer, ",") do
-      [_, "VS" <> start, "VE" <> stop] ->
-        String.to_integer(stop) - String.to_integer(start)
-      [_, "VS" <> _, "VS" <> _] ->
-        0
-      _ ->
-        -1
     end
   end
 

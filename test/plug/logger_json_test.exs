@@ -46,7 +46,6 @@ defmodule Plug.LoggerJSONTest do
     assert map["client_version"] == "N/A"
     assert map["date_time"]
     assert map["duration"]
-    assert map["fastly_duration"] == -1
     assert map["handler"] == "N/A"
     assert map["log_type"] == "http"
     assert map["method"] == "GET"
@@ -70,7 +69,6 @@ defmodule Plug.LoggerJSONTest do
     assert map["client_version"] == "N/A"
     assert map["date_time"]
     assert map["duration"]
-    assert map["fastly_duration"] == -1
     assert map["handler"] == "N/A"
     assert map["log_type"] == "http"
     assert map["method"] == "GET"
@@ -95,7 +93,6 @@ defmodule Plug.LoggerJSONTest do
     assert map["client_version"] == "N/A"
     assert map["date_time"]
     assert map["duration"]
-    assert map["fastly_duration"] == -1
     assert map["handler"] == "Elixir.Plug.LoggerJSONTest#show"
     assert map["log_type"] == "http"
     assert map["method"] == "GET"
@@ -126,7 +123,6 @@ defmodule Plug.LoggerJSONTest do
     assert map["client_version"] == "N/A"
     assert map["date_time"]
     assert map["duration"]
-    assert map["fastly_duration"] == -1
     assert map["handler"] == "N/A"
     assert map["log_type"] == "http"
     assert map["method"] == "POST"
@@ -157,7 +153,6 @@ defmodule Plug.LoggerJSONTest do
     assert map["client_version"] == "N/A"
     assert map["date_time"]
     assert map["duration"]
-    assert map["fastly_duration"] == -1
     assert map["handler"] == "Elixir.Plug.LoggerJSONTest#show"
     assert map["log_type"] == "http"
     assert map["method"] == "GET"
@@ -176,30 +171,5 @@ defmodule Plug.LoggerJSONTest do
     map     = Poison.decode! message
 
     assert map["client_version"] == "ios/1.5.4"
-  end
-
-  describe "fastly x-timer header" do
-    test "cached, outputs fastly duration correctly" do
-      {_conn, message} = conn(:get, "/")
-                          |> put_req_header("x-timer", "S1470085542.060224,VS0,VE10")
-                          |> call
-      message  = String.replace(message, "\e[22m", "")
-      message  = String.replace(message, "\n\e[0m", "")
-      map      = Poison.decode! message
-
-      assert map["fastly_duration"] == 10
-    end
-
-    test "cache miss, outputs fastly duration correctly" do
-      {_conn, message} = conn(:get, "/")
-                          |> put_req_header("x-timer", "S1470085542.060224,VS0,VS0")
-                          |> call
-
-      message = String.replace(message, "\e[22m", "")
-      message = String.replace(message, "\n\e[0m", "")
-      map     = Poison.decode! message
-
-      assert map["fastly_duration"] == 0
-    end
   end
 end
